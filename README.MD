@@ -6,44 +6,39 @@ used/provided by [time](https://crates.io/crates/time).
 
 ## Usage
 
-### From CSTime formats to `time` formats
-
-To convert a CSTime date into a `time::Date` format:
-
-```rust
-use cstime::cstime_to_date;
-use time::macros::date;
-let date = cstime_to_date(80727).unwrap();
-assert_eq!(date, date!(2022-01-05));
-```
-
-To convert a CSTime time into a `time::Time` format:
+This library provides two types, `CSTime` and `CSDate` which represent 
+time and date values, respectively. They can be created using the `new`
+constructor: 
 
 ```rust
-use cstime::cstime_to_time;
-use time::macros::time;
-assert_eq!(cstime_to_time(5964000), time!(16:34:00));
+// Create a new CSTime value.
+var cs_time = CSTime::new(5964000);
+
+// Create a new CSDate value. Note that CSDate::new returns a 
+// Result<CSDate, String>, because the input can be out of range.
+var cs_date = CSDate::new(80727).unwrap();
 ```
 
-### From `time` formats to CSTime formats
-
-To convert a `time::Date` format into a CSTime date format:
+These objects can be freely converted to/from `time` compatible formats
+using the `from()` and `into()` functions.
 
 ```rust
-use cstime::date_to_cstime;
-use time::macros::date;
-let date = date!(2021-10-07);
-assert_eq!(date_to_cstime(date), 80637);
+var cs_time = CSTime::new(5964000);
+var cs_date = CSDate::new(80727).unwrap();
+var time: time::Time = cs_time.into();
+var date: time::Date::from(cs_date);
 ```
 
-To convert a `time::Time` format into a CSTime time format:
+The conversion is fully reversible:
 
 ```rust
-use cstime::time_to_cstime;
-use time::macros::time;
-let time = time!(16:01:54.21);
-assert_eq!(time_to_cstime(time), 5771421);
+var cs_date = CSDate::new(80727).unwrap();
+var date: time::Date = cs_date.into();
+var another_cs_date: CSDate = date.into();
 ```
+
+The raw `i32` value can be extracted out of a `CSTime`/`CSDate` value using
+the `time()` or `date()` functions, respectively.
 
 ## License
 
