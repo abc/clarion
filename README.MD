@@ -4,41 +4,62 @@ A library to simplify working with CSTime software date/time formats by
 enabling simple translation to and from the CSTime formats into the formats
 used/provided by [time](https://crates.io/crates/time).
 
+CSTime formats are all based on integral numbers, represented within this 
+library as `i32`s. Dates are specified as the number of days between a given
+date and the 28th of December, 1800. Times are specified as the number of 
+centiseconds between a given time and midnight.
+
+A standard error format is also specified, named `CSErr`, which at present
+is only used for out-of-range conversion errors (`CSErr::ConversionOverflowed`).
+
 ## Usage
 
 This library provides two types, `CSTime` and `CSDate` which represent 
 time and date values, respectively. They can be created using the `new`
-constructor: 
+constructor or with the standard struct initialization syntax:
 
 ```rust
 // Create a new CSTime value.
-var cs_time = CSTime::new(5964000);
+let cs_time = cstime::CSTime::new(5964000);
+let cs_time2 = cstime::CSTime { time: 5964000 };
 
-// Create a new CSDate value. Note that CSDate::new returns a 
-// Result<CSDate, String>, because the input can be out of range.
-var cs_date = CSDate::new(80727).unwrap();
+// Create a new CSDate value.
+let cs_date = cstime::CSDate::new(80727);
+let cs_date2 = cstime::CSDate { date: 80727 };
 ```
 
 These objects can be freely converted to/from `time` compatible formats
-using the `from()` and `into()` functions.
+using the `from()`/`try_from()` and/or the `into()`/`try_into()` functions.
 
 ```rust
-var cs_time = CSTime::new(5964000);
-var cs_date = CSDate::new(80727).unwrap();
-var time: time::Time = cs_time.into();
-var date: time::Date::from(cs_date);
+// Convert `Date` into `CSDate` using `from()`.
+let date = time::macros::date!(2022-01-05);
+let cs_date = cstime::CSDate::from(date);
+assert_eq!(cs_date.date, 80727);
+
+// Convert `CSDate` into `Date` using `try_from()`.
+let cs_date = cstime::CSDate::new(80727);
+let date = time::Date::try_from(cs_date)
+    .expect("The input value produce a valid date between Date::MAX and Date::MIN.");
+assert_eq!(date, time::macros::date!(2022-01-05));
+
+// Convert `CSTime` into `Time` using `into()`.
+let cs_time = cstime::CSTime::new(5964000);
+let time: time::Time = cs_time.into();
+assert_eq!(time, time::macros::time!(16:34:00))
 ```
 
 The conversion is fully reversible:
 
 ```rust
-var cs_date = CSDate::new(80727).unwrap();
-var date: time::Date = cs_date.into();
-var another_cs_date: CSDate = date.into();
+let cs_date = cstime::CSDate::new(80727);
+let date: time::Date = cs_date.try_into().unwrap();
+let another_cs_date: cstime::CSDate = date.into();
+assert_eq!(another_cs_date, cs_date);
 ```
 
-The raw `i32` value can be extracted out of a `CSTime`/`CSDate` value using
-the `time()` or `date()` functions, respectively.
+The raw `i32` value can be extracted out of a `CSTime`/`CSDate` value by 
+directly accessing the `time` or `date` values of the respective struct.
 
 ## License
 
