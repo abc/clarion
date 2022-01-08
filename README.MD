@@ -13,7 +13,7 @@ as the number of centiseconds between a given time and midnight.
 The Clarion color format is also an integral number represented by `i32`,
 however in practice this number is never below zero or above 16,777,215.
 The number is the base-10 representation of a hex number in BGR format,
-e.g. 0xBBGGRR, where 11 is blue, 22 is green and 33 is red.
+e.g. 0xBBGGRR, where BB is blue, GG is green and RR is red.
 
 A standard error format is also specified, named `ClarionErr`, which is
 used for out-of-range conversion and constructor errors
