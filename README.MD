@@ -1,65 +1,118 @@
-# cstime
+# clarion
 
-A library to simplify working with CSTime software date/time formats by 
-enabling simple translation to and from the CSTime formats into the formats
-used/provided by [time](https://crates.io/crates/time).
+A library to simplify working with Clarion software data formats by 
+enabling simple translation to and from the Clarion formats, including
+converting Clarion color formats into an RGB format, and date/time into
+the formats used/provided by [time](https://crates.io/crates/time).
 
-CSTime formats are all based on integral numbers, represented within this 
-library as `i32`s. Dates are specified as the number of days between a given
-date and the 28th of December, 1800. Times are specified as the number of 
-centiseconds between a given time and midnight.
+Clarion date/time formats are all based on integral numbers, represented 
+within this library as `i32`s. Dates are specified as the number of days 
+between a given date and the 28th of December, 1800. Times are specified 
+as the number of centiseconds between a given time and midnight.
 
-A standard error format is also specified, named `CSErr`, which at present
-is only used for out-of-range conversion errors (`CSErr::ConversionOverflowed`).
+The Clarion color format is also an integral number represented by `i32`,
+however in practice this number is never below zero or above 16,777,215.
+The number is the base-10 representation of a hex number in BGR format,
+e.g. 0xBBGGRR, where 11 is blue, 22 is green and 33 is red.
+
+A standard error format is also specified, named `ClarionErr`, which is
+used for out-of-range conversion and constructor errors
+(`ClarionErr::ConversionOverflowed` and `ClarionErr::OutOfRange`).
 
 ## Usage
 
-This library provides two types, `CSTime` and `CSDate` which represent 
-time and date values, respectively. They can be created using the `new`
-constructor or with the standard struct initialization syntax:
+This library provides four main structs, `ClarionTime`, `ClarionDate`,
+`ClarionColor` and `RgbColor`.
+
+`ClarionColor` and `RgbColor` represent colors in the 24-bit RGB color
+space, and `ClarionTime`/`ClarionDate` represent time and date values,
+respectively. `ClarionDate`,  `ClarionTime` and `ClarionColor` types can
+be created using the `new()` constructor function, whereas `RgbColor` can
+be created using the standard struct initializer syntax:
 
 ```rust
-// Create a new CSTime value.
-let cs_time = cstime::CSTime::new(5964000);
-let cs_time2 = cstime::CSTime { time: 5964000 };
+// Create a new ClarionTime value (16:34:00).
+let c_time = clarion::ClarionTime::new(5964000);
 
-// Create a new CSDate value.
-let cs_date = cstime::CSDate::new(80727);
-let cs_date2 = cstime::CSDate { date: 80727 };
+// Create a new ClarionDate value (2022-01-05).
+let c_date = clarion::ClarionDate::new(80727);
+
+// Create a new ClarionColor value (white).
+let c_color = clarion::ClarionColor::new(16777215)
 ```
 
-These objects can be freely converted to/from `time` compatible formats
+### `ClarionDate`/`ClarionTime`
+
+Date/time types can be freely converted to/from `time` compatible formats
 using the `from()`/`try_from()` and/or the `into()`/`try_into()` functions.
 
 ```rust
-// Convert `Date` into `CSDate` using `from()`.
+// Convert `Date` into `ClarionDate` using `from()`.
 let date = time::macros::date!(2022-01-05);
-let cs_date = cstime::CSDate::from(date);
-assert_eq!(cs_date.date, 80727);
+let c_date = clarion::ClarionDate::from(date);
+assert_eq!(c_date.date(), 80727);
 
-// Convert `CSDate` into `Date` using `try_from()`.
-let cs_date = cstime::CSDate::new(80727);
-let date = time::Date::try_from(cs_date)
-    .expect("The input value produce a valid date between Date::MAX and Date::MIN.");
+// Convert `ClarionDate` into `Date` using `try_from()`.
+let c_date = clarion::ClarionDate::new(80727);
+let date = time::Date::try_from(c_date)
+    .expect("Value did not represent a date between Date::MAX and Date::MIN.");
 assert_eq!(date, time::macros::date!(2022-01-05));
 
-// Convert `CSTime` into `Time` using `into()`.
-let cs_time = cstime::CSTime::new(5964000);
-let time: time::Time = cs_time.into();
+// Convert `ClarionTime` into `Time` using `into()`.
+let c_time = clarion::ClarionTime::new(5964000);
+let time: time::Time = c_time.into();
 assert_eq!(time, time::macros::time!(16:34:00))
 ```
-
+disc
 The conversion is fully reversible:
 
 ```rust
-let cs_date = cstime::CSDate::new(80727);
-let date: time::Date = cs_date.try_into().unwrap();
-let another_cs_date: cstime::CSDate = date.into();
-assert_eq!(another_cs_date, cs_date);
+let c_date = clarion::ClarionDate::new(80727);
+let date: time::Date = c_date.try_into().unwrap();
+let another_c_date: clarion::ClarionDate = date.into();
+assert_eq!(another_c_date, c_date);
 ```
 
-The raw `i32` value can be extracted out of a `CSTime`/`CSDate` value by 
-directly accessing the `time` or `date` values of the respective struct.
+The raw `i32` value can be extracted out of a `ClarionTime` or 
+`ClarionDate` value by using the `time()` or `date()` functions
+of the respective struct.
+
+### `ClarionColor`/`RgbColor`
+
+`ClarionColor` and `RgbColor` can be freely converted between using
+the `from()` and `into()` functions.
+
+```rust
+// Convert an RgbColor into a ClarionColor.
+let color = clarion::RgbColor {red: 255, green: 128, blue: 64};
+let c_color = clarion::ClarionColor::from(color);
+assert_eq!(c_color.color(), 4227327);
+```
+
+```rust
+// Convert a ClarionColor into an RgbColor.
+let c_color = clarion::ClarionColor::new(4227327).unwrap();
+let color = clarion::RgbColor::from(c_color);
+let expected_color = clarion::RgbColor {red: 255, green: 128, blue: 64};
+assert_eq!(color, expected_color);
+```
+
+The integral value of a `ClarionColor` value can be accessed using the
+`color()` function:
+
+```rust
+let c_color = clarion::ClarionColor::new(4259584).unwrap();
+assert_eq!(c_color.color(), 4259584);
+```
+
+The underlying `u8` values of an `RgbColor` value can be accessed using
+the respective `red`, `green` or `blue` member of the struct:
+
+```rust
+let color = clarion::RgbColor { red: 128, green: 64, blue: 0 };
+let (red, green, blue) = (color.red, color.green, color.blue);
+assert_eq!((red, green, blue), (128, 64, 0));
+```
 
 ## License
 
@@ -71,5 +124,5 @@ This project is licensed under either of
 at your option.
 
 Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in cstime by you, as defined in the Apache-2.0 license, shall be 
+for inclusion in clarion by you, as defined in the Apache-2.0 license, shall be 
 dual licensed as above, without any additional terms or conditions.

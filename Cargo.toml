@@ -1,9 +1,15 @@
 [package]
-name = "cstime"
+name = "clarion"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["Alastair Campbell <alastair.campbell@runbox.com>"]
+license = "MIT OR Apache-2.0"
+keywords = ["clarion", "conversion", "capesoft"]
+categories = ["development-tools::ffi", "data-structures", "date-and-time"]
+description = "A library to simplify working with Clarion software data formats."
+readme = "README.md"
+repository = "https://github.com/abc/clarion/"
+include = ["LICENSE-*", "README.md"]
 
 [dependencies]
 time = { version = "0.3.5", features = ["macros"] }
