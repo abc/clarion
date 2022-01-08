@@ -63,7 +63,6 @@ let c_time = clarion::ClarionTime::new(5964000);
 let time: time::Time = c_time.into();
 assert_eq!(time, time::macros::time!(16:34:00))
 ```
-disc
 The conversion is fully reversible:
 
 ```rust
