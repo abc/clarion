@@ -1,11 +1,7 @@
 # clarion
 
-This repository is hosted on [git.3e.gg](https://git.3e.gg/acampbell/clarion)
-and is mirrored to GitHub for convenience and backup purposes. If you would
-like to collaborate, please do so on the Gitea instance linked above. Thank you!
-
 [![Crates.io](https://img.shields.io/crates/v/clarion?logo=rust&style=flat-square)](https://crates.io/crates/clarion)
-[![Crates.io](https://img.shields.io/static/v1?label=github%20mirror&message=abc/clarion&color=blue&style=flat-square&logo=github)](https://github.com/abc/clarion)
+[![Crates.io](https://img.shields.io/static/v1?label=github&message=abc/clarion&color=blue&style=flat-square&logo=github)](https://github.com/abc/clarion)
 ![Crates.io](https://img.shields.io/crates/l/clarion?style=flat-square)
 
 A library to simplify working with Clarion software data formats by 
