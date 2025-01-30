@@ -1,14 +1,14 @@
 [package]
 name = "clarion"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
-authors = ["Alastair Campbell <ac@mpbell.io>"]
+authors = ["Blake Campbell <bc@mpbell.io>"]
 license = "MIT OR Apache-2.0"
 keywords = ["clarion", "conversion", "capesoft"]
 categories = ["development-tools::ffi", "data-structures", "date-and-time"]
 description = "A library to simplify working with Clarion software data formats."
 readme = "README.md"
-repository = "https://git.3e.gg/acampbell/clarion/"
+repository = "https://github.com/abc/clarion"
 
 [dependencies]
 time = { version = "0.3.5", features = ["macros"] }
